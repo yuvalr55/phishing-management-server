@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo-data:/data/db
+
+  management-server:
+    build:
+      context: ./phishing-management-server
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://root:root@mongodb:27017/
+    depends_on:
+      - mongodb
+
+  simulation-server:
+    build:
+      context: ./phishing-simulation-server
+      dockerfile: Dockerfile
+    container_name: simulation-server
+    restart: always
+    ports:
+      - "8001:8000"
+    environment:
+      - MONGO_URI=mongodb://root:root@mongodb:27017/
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo-data:
