@@ -3,11 +3,12 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as process from 'node:process';
 import cookieParser from 'cookie-parser';
+import { AppLogger } from './app.logger';
 
 async function bootstrap() {
+  const logger = AppLogger;
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,11 +26,10 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix(process.env.URL_VERSION!);
-  await app.listen(process.env.SERVER_PORT!, () => {
-    console.log(
-      `Server is running on http://localhost:${process.env.SERVER_PORT!}/${process.env.URL_VERSION}`,
-    );
-  });
+  await app.listen(process.env.SERVER_PORT!);
+  logger.log(
+    `Server is running on http://localhost:${process.env.SERVER_PORT}/${process.env.URL_VERSION}`,
+  );
 }
 
 bootstrap();

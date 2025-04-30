@@ -1,9 +1,7 @@
 import { Model } from 'mongoose';
 import { UserDocument } from '../user/user.schema';
-import { RegisterUserDto } from '../../../phishing-simulation-server/src/dto/dto.schema';
-import { Logger } from '@nestjs/common';
-
-const logger = new Logger('AuthQuery');
+import { RegisterUserDto } from '../dto/dto.schema';
+import { AppLogger as logger } from '../app.logger';
 
 export const findUserByEmail = async (
   userModel: Model<UserDocument>,

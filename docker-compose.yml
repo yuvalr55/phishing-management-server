@@ -12,32 +12,30 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
       - mongo-data:/data/db
+    networks:
+      - shared-net
 
   management-server:
     build:
-      context: ./phishing-management-server
+      context: .
       dockerfile: Dockerfile
-    container_name: backend
+    container_name: management-server
     restart: always
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - MONGO_URI=mongodb://root:root@mongodb:27017/
+      - SERVER_PORT=8000
+      - MONGO_URI=mongodb://root:root@mongodb:27017/register?authSource=admin
     depends_on:
       - mongodb
-
-  simulation-server:
-    build:
-      context: ./phishing-simulation-server
-      dockerfile: Dockerfile
-    container_name: simulation-server
-    restart: always
-    ports:
-      - "8001:8000"
-    environment:
-      - MONGO_URI=mongodb://root:root@mongodb:27017/
-    depends_on:
-      - mongodb
+    networks:
+      - shared-net
 
 volumes:
   mongo-data:
+
+networks:
+  shared-net:
+    driver: bridge

@@ -1,25 +1,25 @@
-FROM node:18 AS builder
+# Development image with source code
+FROM node:18-alpine
 
+# Set working directory
 WORKDIR /usr/src/app
 
+# Install build dependencies
+RUN apk add --no-cache make gcc g++ python3 git
+
+# Copy package files
 COPY package*.json ./
-RUN npm install
 
+# Install dependencies
+RUN npm ci
+RUN npm uninstall bcrypt && npm install bcrypt --build-from-source
+
+# Copy source files
 COPY . .
-RUN npm run build
 
-FROM node:18-slim
+# Set environment variables
+ENV NODE_ENV=production
+EXPOSE 8000
 
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/package*.json ./
-RUN npm install --only=production
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/.env ./.env
-
-ENV PORT=8000
-
-EXPOSE ${PORT}
-
-CMD ["sh", "-c", "node dist/main.js"]
+# Use ts-node to run the application directly from TypeScript
+CMD ["npx", "ts-node", "src/main.ts"]

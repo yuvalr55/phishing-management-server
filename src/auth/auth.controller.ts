@@ -8,10 +8,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import {
-  RegisterUserDto,
-  LoginUserDto,
-} from '../../../phishing-simulation-server/src/dto/dto.schema';
+import { RegisterUserDto, LoginUserDto } from '../dto/dto.schema';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { Response } from 'express';
@@ -52,12 +49,5 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   checkAuth(@Req() req: Request & { user?: string }) {
     return { status: 'authenticated', user: req.user };
-  }
-
-  @Get('table')
-  @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
-  async tablePhishingClick() {
-    return await this.usersService.tableAttackStatus();
   }
 }

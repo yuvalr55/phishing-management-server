@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { Logger } from '@nestjs/common';
+import { AppLogger } from './app.logger';
 import { UserDocument, User } from './user/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -35,7 +35,7 @@ enum AuthErrorMessages {
 @Injectable()
 /** Guard that verifies JWT tokens for authentication. */
 export class JwtAuthGuard implements CanActivate {
-  private readonly logger = new Logger(JwtAuthGuard.name);
+  private readonly logger = AppLogger;
 
   /** Initializes JwtAuthGuard with JwtService and User model. */
   constructor(
@@ -72,7 +72,6 @@ export class JwtAuthGuard implements CanActivate {
 
     let userPayload: JwtPayload;
     try {
-      console.log(cleanedToken);
       userPayload = this.jwtService.verify<JwtPayload>(cleanedToken);
     } catch (error) {
       this.handleJwtError(error);
@@ -90,7 +89,6 @@ export class JwtAuthGuard implements CanActivate {
       this.logger.error(AuthErrorMessages.UserEmailMismatch);
       throw new UnauthorizedException(AuthErrorMessages.InvalidToken);
     }
-
     if (existingUser.isAdmin !== req.user.isAdmin) {
       this.logger.error(AuthErrorMessages.UserAdminMismatch);
       throw new UnauthorizedException(AuthErrorMessages.InvalidToken);
